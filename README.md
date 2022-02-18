@@ -17,6 +17,6 @@ My game will use the usual canvas, css, javascript, and html
 9. Create win counter/update via win conditions/annouce win
 10. Restart from the beginning given win with oncoming obstacles increasing their speed
 
-![Frogger Overall Concept](cv-frogger-screen_0.png)
+![Frogger Overall Concept](/images/cv-frogger-screen_0.png)
 
 I would love to have unique random images of cars and different animals upon which to jump along with the logs but I dont want to get too ahead of myself.
