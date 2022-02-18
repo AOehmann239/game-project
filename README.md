@@ -1,9 +1,5 @@
 # game-project-frogger
 
-My game will be a simplified version of the classic Frogger game
-
-My game will use the usual canvas, css, javascript, and html
-
 ###Perceived steps
 
 1. Create the board
@@ -19,4 +15,11 @@ My game will use the usual canvas, css, javascript, and html
 
 ![Frogger Overall Concept](/images/cv-frogger-screen_0.png)
 
+###Stretch Goals
 I would love to have unique random images of cars and different animals upon which to jump along with the logs but I dont want to get too ahead of myself.
+
+###Technologies Used
+JS
+CSS
+HTML
+Canvas
