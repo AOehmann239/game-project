@@ -1,6 +1,8 @@
 const game = document.getElementById('canvas');
 const movement = document.getElementById('movement');
 const ctx = game.getContext('2d');
+const resetButton = document.getElementById('resetButton');
+resetButton.style.display = 'none';
 // game.setAttribute('width', getComputedStyle(game)['width']);
 // game.setAttribute('height', getComputedStyle(game)['height']);
 //should I not use this because all the elements in the game need to be a set size
@@ -111,6 +113,7 @@ const log1 = new Obstacle(40, 80, 'brown', 100, 40, 'log');
 
 const stopGameLoop = () => {
   clearInterval(gameTime);
+  resetButton.style.display = '';
 };
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -156,6 +159,12 @@ document.addEventListener('keyup', (e) => {
   // change the corresponding direction to false
   if (['w', 'a', 's', 'd'].includes(e.key)) {
     frog.unsetDirection(e.key);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (e) {
+    window.location.reload();
   }
 });
 
