@@ -1,11 +1,12 @@
 const game = document.getElementById('canvas');
 const movement = document.getElementById('movement');
 const ctx = game.getContext('2d');
+const statusMessage = document.getElementById('status');
 const resetButton = document.getElementById('resetButton');
 resetButton.style.display = 'none';
-const statusMessage = document.getElementById('status');
 const levelUpButton = document.getElementById('levelUpButton');
 levelUpButton.style.display = 'none';
+const gameLevel = document.getElementById('levelMessage');
 
 // game.setAttribute('width', getComputedStyle(game)['width']);
 // game.setAttribute('height', getComputedStyle(game)['height']);
@@ -102,6 +103,7 @@ class Obstacle {
   render = function () {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    this.x = this.x + this.speed;
   };
 }
 
@@ -109,14 +111,15 @@ class Obstacle {
 const frog = new Frogger(280, 560, 'green', 40, 40);
 
 // lane 1 cars
-const car1 = new Obstacle(360, 480, 'red', 160, 60, 1, 'car');
+const car1 = new Obstacle(360, 480, 'red', 160, 60, -1, 'car');
 
-const log1 = new Obstacle(40, 80, 'brown', 100, 40, 'log');
+const log1 = new Obstacle(40, 80, 'brown', 100, 40, 2, 'log');
 
 document.addEventListener('DOMContentLoaded', function () {
   gameTime;
 });
 
+//loop that runs the game
 const gameLoop = () => {
   ctx.clearRect(0, 0, game.width, game.height);
   //   console.log('the frog', frog);
@@ -126,7 +129,10 @@ const gameLoop = () => {
     detectHit();
     winning();
   } else {
-    stopGameLoop();
+    statusMessage.textContent = 'You died :/';
+    resetButton.style.display = '';
+    levelUpButton.style.display = 'none';
+    clearInterval(gameTime);
   }
   movement.textContent = frog.x + ', ' + frog.y;
   car1.render();
@@ -134,11 +140,7 @@ const gameLoop = () => {
   frog.frogMovementHandler();
 };
 
-const stopGameLoop = () => {
-  clearInterval(gameTime);
-  resetButton.style.display = '';
-};
-
+//hit detection
 const detectHit = () => {
   if (
     car1.x < frog.x + frog.width &&
@@ -147,16 +149,6 @@ const detectHit = () => {
     car1.y + car1.height > frog.y
   ) {
     frog.alive = false;
-    statusMessage.textContent = 'You died :/';
-    stopGameLoop();
-  }
-};
-
-const winning = () => {
-  if (frog.y <= 0) {
-    statusMessage.textContent = 'You won! \n Live to die another day';
-    clearInterval(gameTime);
-    levelUpButton.style.display = '';
   }
 };
 
@@ -174,29 +166,37 @@ document.addEventListener('keyup', (e) => {
   }
 });
 
-document.addEventListener('click', (resetButton) => {
-  if (resetButton) {
-    window.location.reload();
-    level = 1;
-    gameLevel.textContent = 'Level 1';
+const winning = () => {
+  if (frog.y <= 0) {
+    statusMessage.textContent = 'You won! \n Live to die another day';
+    clearInterval(gameTime);
+    levelUpButton.style.display = '';
   }
-});
-document.addEventListener('click', (levelUpButton) => {
-  if (levelUpButton) {
-    window.location.reload();
-    level++;
-    gameLevel.textContent = 'Level 1';
-  }
-});
+};
 
-//second button to play next level should be here
-// document.addEventListener('click', (e) => {
-//     if (e) {
-//       window.location.reload();
-//       level = 1;
-//       gameLevel.textContent = 'Level 1';
-//     }
-//   });
+const handleResetButton = () => {
+  //   resetButton.style.display = '';
+  window.location.reload();
+  level = 1;
+  gameLevel.textContent = 'Level 1';
+};
+
+const handleLevelUpButton = () => {
+  //   levelUpButton.style.display = '';
+  frog.x = 280;
+  frog.y = 560;
+  level++;
+  Obstacle.speed * 1.5;
+  gameLevel.textContent = 'Level ' + level;
+  gameTime = setInterval(gameLoop, 60);
+};
+
+document
+  .getElementById('resetButton')
+  .addEventListener('click', handleResetButton);
+document
+  .getElementById('levelUpButton')
+  .addEventListener('click', handleLevelUpButton);
 
 let gameTime = setInterval(gameLoop, 60);
 
