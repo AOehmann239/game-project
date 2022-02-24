@@ -6,10 +6,6 @@ const ctx = game.getContext('2d');
 //should I not use this because all the elements in the game need to be a set size
 
 const grid = 40;
-let keys = [];
-let score = 0;
-const carsArray = [];
-const logsArray = [];
 
 //using a constructor to build the various objects in the game
 class Frogger {
@@ -20,13 +16,74 @@ class Frogger {
       (this.width = width),
       (this.height = height),
       (this.alive = true);
+    (this.speed = 10),
+      (this.direction = {
+        up: false,
+        down: false,
+        right: false,
+        left: false,
+      });
   }
+  setDirection = function (key) {
+    console.log('the key pressed is', key);
+    // pressing key(keydown), changes direction from false to true
+    if (key.toLowerCase() == 'w') this.direction.up = true;
+    if (key.toLowerCase() == 'a') this.direction.left = true;
+    if (key.toLowerCase() == 's') this.direction.down = true;
+    if (key.toLowerCase() == 'd') this.direction.right = true;
+  };
+  // this method will 'unset' our direction when the key is lifted(keyup)
+  // sets direction to false
+  unsetDirection = function (key) {
+    console.log('the key pressed is', key);
+    // pressing key(keydown), changes direction from false to true
+    if (key.toLowerCase() == 'w') this.direction.up = false;
+    if (key.toLowerCase() == 'a') this.direction.left = false;
+    if (key.toLowerCase() == 's') this.direction.down = false;
+    if (key.toLowerCase() == 'd') this.direction.right = false;
+  };
+  frogMovementHandler = function () {
+    // movePlayer will take and look at the direction that is set
+    // movePlayer will then send the guy flying in that direction
+    // move up
+    if (this.direction.up) {
+      this.y -= this.speed;
+      // because we're tracking 'up' movement, we'll add our top of canvas case
+      if (this.y <= 0) {
+        this.y = 0;
+      }
+    }
+    // move left
+    if (this.direction.left) {
+      this.x -= this.speed;
+      // bc we're tracking left movement, we need the left edge of the canvas
+      if (this.x <= 0) {
+        this.x = 0;
+      }
+    }
+    // move down
+    if (this.direction.down) {
+      this.y += this.speed;
+      // bc we're tracking down movement, we need the bottom edge of the canvas
+      // but we also need to consider the hero's height
+      if (this.y + this.height >= game.height) {
+        this.y = game.height - this.height;
+      }
+    }
+    // move right
+    if (this.direction.right) {
+      this.x += this.speed;
+      // bc we're tracking left movement, we need the left edge of the canvas
+      if (this.x + this.width >= game.width) {
+        this.x = game.width - this.width;
+      }
+    }
+  };
   render = function () {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
 }
-
 class Obstacle {
   constructor(x, y, color, width, height, type) {
     this.x = x;
@@ -57,37 +114,23 @@ const stopGameLoop = () => {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.addEventListener('keydown', frogMovementHandler);
   gameTime;
 });
 
 const gameLoop = () => {
   ctx.clearRect(0, 0, game.width, game.height);
   //   console.log('the frog', frog);
-  car1.render();
-  log1.render();
+
   if (frog.alive) {
     frog.render();
     detectHit();
+  } else {
+    stopGameLoop();
   }
   movement.textContent = frog.x + ', ' + frog.y;
-};
-
-const frogMovementHandler = (e) => {
-  switch (e.keyCode) {
-    case 87: //move from up with w key
-      frog.y -= 40;
-      break;
-    case 65: //move left with a key
-      frog.x -= 40;
-      break;
-    case 83: //move down with s key
-      frog.y += 40;
-      break;
-    case 68: //move right with d key
-      frog.x += 40;
-      break;
-  }
+  car1.render();
+  log1.render();
+  frog.frogMovementHandler();
 };
 
 const detectHit = () => {
@@ -102,9 +145,23 @@ const detectHit = () => {
   }
 };
 
+document.addEventListener('keydown', (e) => {
+  // when the key is pressed, change the direction
+  // according to the setDirection HeroCrawler method
+  frog.setDirection(e.key);
+});
+
+document.addEventListener('keyup', (e) => {
+  // now if any of the keys that are released correspond to a movement key
+  // change the corresponding direction to false
+  if (['w', 'a', 's', 'd'].includes(e.key)) {
+    frog.unsetDirection(e.key);
+  }
+});
+
 let gameTime = setInterval(gameLoop, 60);
+
 /*
---render vs draw
 --using a for loop to store the location of objects in an array
 and pushing the new location 
 --should I be using clear rect in this case?
