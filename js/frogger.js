@@ -3,12 +3,17 @@ const movement = document.getElementById('movement');
 const ctx = game.getContext('2d');
 const resetButton = document.getElementById('resetButton');
 resetButton.style.display = 'none';
+const statusMessage = document.getElementById('status');
+const levelUpButton = document.getElementById('levelUpButton');
+levelUpButton.style.display = 'none';
+
 // game.setAttribute('width', getComputedStyle(game)['width']);
 // game.setAttribute('height', getComputedStyle(game)['height']);
 //should I not use this because all the elements in the game need to be a set size
 
 const grid = 40;
-
+let carsArray = [];
+let level = 1;
 //using a constructor to build the various objects in the game
 class Frogger {
   constructor(x, y, color, width, height) {
@@ -51,10 +56,8 @@ class Frogger {
     if (this.direction.up) {
       this.y -= this.speed;
       // because we're tracking 'up' movement, we'll add our top of canvas case
-      if (this.y <= 0) {
-        this.y = 0;
-      }
     }
+
     // move left
     if (this.direction.left) {
       this.x -= this.speed;
@@ -87,13 +90,13 @@ class Frogger {
   };
 }
 class Obstacle {
-  constructor(x, y, color, width, height, type) {
+  constructor(x, y, color, width, height, speed, type) {
     this.x = x;
     this.y = y;
     this.color = color;
     this.width = width;
     this.height = height;
-    // this.speed = speed;
+    this.speed = speed;
     this.type = type;
   }
   render = function () {
@@ -102,19 +105,13 @@ class Obstacle {
   };
 }
 
+//creates our frog
 const frog = new Frogger(280, 560, 'green', 40, 40);
-// function createObstacles(){
-//     for (let i = 0; i < 2; i++){
-//         let x = i * 350;
-//         carsArray.push(new Obstacle)
-//     }
-const car1 = new Obstacle(360, 480, 'red', 160, 60, 'car');
-const log1 = new Obstacle(40, 80, 'brown', 100, 40, 'log');
 
-const stopGameLoop = () => {
-  clearInterval(gameTime);
-  resetButton.style.display = '';
-};
+// lane 1 cars
+const car1 = new Obstacle(360, 480, 'red', 160, 60, 1, 'car');
+
+const log1 = new Obstacle(40, 80, 'brown', 100, 40, 'log');
 
 document.addEventListener('DOMContentLoaded', function () {
   gameTime;
@@ -127,6 +124,7 @@ const gameLoop = () => {
   if (frog.alive) {
     frog.render();
     detectHit();
+    winning();
   } else {
     stopGameLoop();
   }
@@ -134,6 +132,11 @@ const gameLoop = () => {
   car1.render();
   log1.render();
   frog.frogMovementHandler();
+};
+
+const stopGameLoop = () => {
+  clearInterval(gameTime);
+  resetButton.style.display = '';
 };
 
 const detectHit = () => {
@@ -144,7 +147,16 @@ const detectHit = () => {
     car1.y + car1.height > frog.y
   ) {
     frog.alive = false;
-    document.getElementById('status').textContent = 'You died :/';
+    statusMessage.textContent = 'You died :/';
+    stopGameLoop();
+  }
+};
+
+const winning = () => {
+  if (frog.y <= 0) {
+    statusMessage.textContent = 'You won! \n Live to die another day';
+    clearInterval(gameTime);
+    levelUpButton.style.display = '';
   }
 };
 
@@ -162,35 +174,43 @@ document.addEventListener('keyup', (e) => {
   }
 });
 
-document.addEventListener('click', (e) => {
-  if (e) {
+document.addEventListener('click', (resetButton) => {
+  if (resetButton) {
     window.location.reload();
+    level = 1;
+    gameLevel.textContent = 'Level 1';
   }
 });
+document.addEventListener('click', (levelUpButton) => {
+  if (levelUpButton) {
+    window.location.reload();
+    level++;
+    gameLevel.textContent = 'Level 1';
+  }
+});
+
+//second button to play next level should be here
+// document.addEventListener('click', (e) => {
+//     if (e) {
+//       window.location.reload();
+//       level = 1;
+//       gameLevel.textContent = 'Level 1';
+//     }
+//   });
 
 let gameTime = setInterval(gameLoop, 60);
 
 /*
---using a for loop to store the location of objects in an array
-and pushing the new location 
---should I be using clear rect in this case?
---levels?? to have the logs be under the frog or just different
-hit reg specifications?
+Need to uniqely define the distinction between the click for the restart button
+and the next level button
 
+When you reach the top it shouldnt prompt you to restart, that should only
+come when you die
 
+when you win there should be another button for next level which also resets 
+in a way but it simply resets your coordinates not refreshes the page
 
-Things to do
---make cars move
---make logs move
---proper hit reg
-
-
-
-
-
-game is running (if frog is alive)
-    game is checking for user movement input
-        if frog and car share coordinates, hit
-        if frog and log share coordinates, frog rides on top?
+the next level button resets your coordinates, adds one to the level counter 
+(which triggers an additional obstacle) and displays the new level in the message
 
 */
