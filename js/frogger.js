@@ -7,15 +7,11 @@ resetButton.style.display = 'none';
 const levelUpButton = document.getElementById('levelUpButton');
 levelUpButton.style.display = 'none';
 const gameLevel = document.getElementById('levelMessage');
-
-// game.setAttribute('width', getComputedStyle(game)['width']);
-// game.setAttribute('height', getComputedStyle(game)['height']);
-//should I not use this because all the elements in the game need to be a set size
-
+let gameSpeed = 1;
 const grid = 40;
 let carsArray = [];
 let level = 1;
-//using a constructor to build the various objects in the game
+//using a constructor to build the frog objects in the game
 class Frogger {
   constructor(x, y, color, width, height) {
     (this.x = x),
@@ -90,6 +86,7 @@ class Frogger {
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
 }
+//creating the cars class
 class Obstacle {
   constructor(x, y, color, width, height, speed, type) {
     this.x = x;
@@ -103,17 +100,70 @@ class Obstacle {
   render = function () {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
-    this.x = this.x + this.speed;
+    this.x = this.x + this.speed * gameSpeed;
+    if (this.speed > 0) {
+      if (this.x > 600 + this.width) {
+        this.x = 0 - this.width;
+      }
+    } else {
+      if (this.x < 0 - this.width) {
+        this.x = 600 + this.width;
+      }
+    }
   };
 }
+//let create our cars
+const initCars = () => {
+  //lane 1
+  for (let i = 0; i < 2; i++) {
+    let x = i * 350;
+    carsArray.push(new Obstacle(x, 480, 'red', 160, 80, 1, 'car'));
+  }
+  //lane 2
+  for (let i = 0; i < 3; i++) {
+    let x = i * 200;
+    carsArray.push(new Obstacle(x, 380, 'orange', 100, 80, -1.3, 'car'));
+  }
+  //lane 3
+  for (let i = 0; i < 4; i++) {
+    let x = i * 300;
+    carsArray.push(new Obstacle(x, 280, 'blue', 80, 80, 1, 'car'));
+  }
+  //lane 4
+  for (let i = 0; i < 2; i++) {
+    let x = i * 250;
+    carsArray.push(new Obstacle(x, 180, 'purple', 160, 80, 1.3, 'car'));
+  }
+  //lane 5
+  for (let i = 0; i < 2; i++) {
+    let x = i * 300;
+    carsArray.push(new Obstacle(x, 80, 'brown', 100, 80, -1.1, 'car'));
+  }
+};
+initCars();
+const handleObstacles = () => {
+  for (let i = 0; i < carsArray.length; i++) {
+    carsArray[i].render();
+  }
+};
 
-//creates our frog
-const frog = new Frogger(280, 560, 'green', 40, 40);
+//lets creates our frog
+let frog = new Frogger(280, 560, 'green', 40, 40);
 
-// lane 1 cars
-const car1 = new Obstacle(360, 480, 'red', 160, 60, -1, 'car');
-
-const log1 = new Obstacle(40, 80, 'brown', 100, 40, 2, 'log');
+const detectHit = () => {
+  // we need an if statement that clearly defines the moment of collision
+  // that means utilizing the x,y, width, and height of whatever we're detecting
+  for (i = 0; i < carsArray.length; i++) {
+    if (
+      frog.x < carsArray[i].x + carsArray[i].width &&
+      frog.x + frog.width > carsArray[i].x &&
+      frog.y < carsArray[i].y + carsArray[i].height &&
+      frog.y + frog.height > carsArray[i].y
+    ) {
+      frog.alive = false;
+    }
+  }
+};
 
 document.addEventListener('DOMContentLoaded', function () {
   gameTime;
@@ -126,6 +176,7 @@ const gameLoop = () => {
 
   if (frog.alive) {
     frog.render();
+    handleObstacles();
     detectHit();
     winning();
   } else {
@@ -135,21 +186,8 @@ const gameLoop = () => {
     clearInterval(gameTime);
   }
   movement.textContent = frog.x + ', ' + frog.y;
-  car1.render();
-  log1.render();
-  frog.frogMovementHandler();
-};
 
-//hit detection
-const detectHit = () => {
-  if (
-    car1.x < frog.x + frog.width &&
-    car1.x + car1.width > frog.x &&
-    car1.y < frog.y + frog.height &&
-    car1.y + car1.height > frog.y
-  ) {
-    frog.alive = false;
-  }
+  frog.frogMovementHandler();
 };
 
 document.addEventListener('keydown', (e) => {
@@ -186,7 +224,7 @@ const handleLevelUpButton = () => {
   frog.x = 280;
   frog.y = 560;
   level++;
-  Obstacle.speed * 1.5;
+  gameSpeed++;
   gameLevel.textContent = 'Level ' + level;
   gameTime = setInterval(gameLoop, 60);
 };
