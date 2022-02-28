@@ -6,7 +6,8 @@
   width: 600px;
   height: 600px;
   transform: translate(-50%, -50%);
-  background: black;
+  /* background-image: url(/images/cv-frogger-screen_0.png); */
+  background-color: black;
 }
 canvas {
   position: absolute;
@@ -16,7 +17,6 @@ canvas {
 }
 h1 {
   text-align: center;
-  background: #f2f6f8;
 }
 #backgroundImg {
   position: absolute;

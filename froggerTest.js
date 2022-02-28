@@ -7,7 +7,6 @@ resetButton.style.display = 'none';
 const levelUpButton = document.getElementById('levelUpButton');
 levelUpButton.style.display = 'none';
 const gameLevel = document.getElementById('levelMessage');
-document.body.style.backgroundImage = "url('')";
 let gameSpeed = 1;
 const grid = 40;
 let carsArray = [];
@@ -122,12 +121,12 @@ const initCars = () => {
   }
   //lane 2
   for (let i = 0; i < 3; i++) {
-    let x = i * 200;
-    carsArray.push(new Obstacle(x, 380, 'orange', 100, 80, -1.3, 'car'));
+    let x = i * 50;
+    carsArray.push(new Obstacle(x, 380, 'orange', 100, 80, 1.3, 'car'));
   }
   //lane 3
   for (let i = 0; i < 4; i++) {
-    let x = i * 300;
+    let x = i * 120;
     carsArray.push(new Obstacle(x, 280, 'blue', 80, 80, 1, 'car'));
   }
   //lane 4
@@ -138,7 +137,7 @@ const initCars = () => {
   //lane 5
   for (let i = 0; i < 2; i++) {
     let x = i * 300;
-    carsArray.push(new Obstacle(x, 80, 'yellow', 100, 80, -1.1, 'car'));
+    carsArray.push(new Obstacle(x, 80, 'purple', 100, 80, 1.1, 'car'));
   }
 };
 initCars();
@@ -178,7 +177,7 @@ const gameLoop = () => {
   if (frog.alive) {
     frog.render();
     handleObstacles();
-    detectHit();
+    // detectHit();
     winning();
   } else {
     statusMessage.textContent = 'You died :/';
@@ -238,18 +237,3 @@ document
   .addEventListener('click', handleLevelUpButton);
 
 let gameTime = setInterval(gameLoop, 60);
-
-/*
-Need to uniqely define the distinction between the click for the restart button
-and the next level button
-
-When you reach the top it shouldnt prompt you to restart, that should only
-come when you die
-
-when you win there should be another button for next level which also resets 
-in a way but it simply resets your coordinates not refreshes the page
-
-the next level button resets your coordinates, adds one to the level counter 
-(which triggers an additional obstacle) and displays the new level in the message
-
-*/
